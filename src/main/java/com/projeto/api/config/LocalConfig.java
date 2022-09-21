@@ -23,8 +23,6 @@ public class LocalConfig {
         repository.saveAll(List.of(usuario1,usuario2));
 
 
-//        User usuario1 = new User(null,"Cynthia","cynthia@email.com","123");
-//        User usuario2 = new User(null,"José","jose@email.com","123");
-//        repository.saveAll(List.of(usuario1,usuario2));
+
     }
 }
