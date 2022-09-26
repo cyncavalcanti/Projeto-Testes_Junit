@@ -3,6 +3,8 @@ package com.projeto.api.services.impl;
 import com.projeto.api.domain.User;
 import com.projeto.api.domain.dto.UserDTO;
 import com.projeto.api.repositories.UserRepository;
+import com.projeto.api.services.exceptions.ObjectNotFoundException;
+import org.h2.command.dml.MergeUsing;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,16 @@ class UserServiceImplTest {
         Assertions.assertEquals(ID, response.getId());//comparação com o id
         Assertions.assertEquals(NAME, response.getName());
         Assertions.assertEquals(PASSWORD, response.getPassword());
+    }
+    @Test //teste quando o objeto não for encontrado
+    void whenFindByIdThenReturnNotFound(){
+        when(repository.findById((anyInt()))).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+        try{
+            service.findById(ID);
+        }catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals("Objeto não encontrado",ex.getMessage());
+        }
     }
 
     @Test
