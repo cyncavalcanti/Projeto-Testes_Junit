@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,6 +29,8 @@ class UserServiceImplTest {
     public static final String NAME = "Cynthia";
     public static final String EMAIL = "cynthia@email.com";
     public static final String PASSWORD = "123";
+    public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
+    public static final int INDEX = 0;
     @InjectMocks
     private UserServiceImpl service;
 
@@ -61,17 +64,27 @@ class UserServiceImplTest {
     }
     @Test //teste quando o objeto não for encontrado
     void whenFindByIdThenReturnNotFound(){
-        when(repository.findById((anyInt()))).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+        when(repository.findById((anyInt()))).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
         try{
             service.findById(ID);
         }catch (Exception ex) {
             assertEquals(ObjectNotFoundException.class, ex.getClass());
-            assertEquals("Objeto não encontrado",ex.getMessage());
+            assertEquals(OBJETO_NAO_ENCONTRADO,ex.getMessage());
         }
     }
 
-    @Test
-    void findAll() {
+    @Test // teste para quando buscar retornar uma lista de users
+    void whenFindAllThenReturnListUsers() {
+       when(repository.findAll()).thenReturn(List.of(user));
+       List<User> response = service.findAll();
+       assertNotNull(response);
+       assertEquals(1,response.size());//para vir apenas um usuario
+       assertEquals(User.class, response.get(INDEX).getClass());
+
+       assertEquals(ID, response.get(INDEX).getId());
+       assertEquals(NAME, response.get(INDEX).getName());
+       assertEquals(EMAIL, response.get(INDEX).getEmail());
+       assertEquals(PASSWORD, response.get(INDEX).getPassword());
     }
 
     @Test
