@@ -3,6 +3,7 @@ package com.projeto.api.services.impl;
 import com.projeto.api.domain.User;
 import com.projeto.api.domain.dto.UserDTO;
 import com.projeto.api.repositories.UserRepository;
+import com.projeto.api.services.exceptions.DataIntegratyViolationException;
 import com.projeto.api.services.exceptions.ObjectNotFoundException;
 import org.h2.command.dml.MergeUsing;
 import org.junit.jupiter.api.Assertions;
@@ -20,8 +21,7 @@ import java.util.Optional;
 
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -89,7 +89,7 @@ class UserServiceImplTest {
        assertEquals(PASSWORD, response.get(INDEX).getPassword());
     }
 
-    @Test
+    @Test // teste quando tiver sucesso na criação
     void whenCreateReturnSuccess() {
         when(repository.save(any())).thenReturn(user);
         User response = service.create(userDTO);
@@ -101,6 +101,20 @@ class UserServiceImplTest {
         assertEquals(EMAIL,response.getEmail());
         assertEquals(PASSWORD,response.getPassword());
 
+
+    }
+
+    @Test // teste quando tiver violação na integridade dos dados retorne exceção
+    void whenCreateReturnAnDataIntegrityViolationException() {
+        when(repository.findByEmail(anyString())).thenReturn(optionalUser);
+
+        try {
+            optionalUser.get().setId(2);
+            service.create(userDTO);
+        } catch (Exception ex) {
+           assertEquals(DataIntegratyViolationException.class, ex.getClass());
+           assertEquals("E-mail já cadastrado no sistema", ex.getMessage());
+        }
 
     }
 
